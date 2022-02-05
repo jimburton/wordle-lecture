@@ -214,7 +214,7 @@ score attempt target =
 
 *Demo:* cabal repl stage1
 
-b* Scoring a word
+* Scoring a word
 
 A ~Guess~ is correct if all the ~CharInfo~ values in it are green. We could map
 ~isGreen~ over a ~Guess~ then check that all the resulting values are ~True~,
@@ -238,7 +238,7 @@ And for neatness, let's rewrite ~correct~ using *pointsfree* style.
 correct = all (isGreen . snd)
 #+END_SRC
 
-b* Making more than one guess
+* Making more than one guess
 
 Playing a game will mean making guesses until one of them is correct or six
 attempts have been made.
@@ -339,18 +339,18 @@ doGuess g attempt = let sc = score attempt (g ^. word)
 
 * Common lens operators
 
- Operator Name 	  Example                                                                                                 
----------+-------+------------------------------------------------------------
- (^.) 	 | view  | g ^. word: gets word in g.
----------+-------+------------------------------------------------------------
- (.~) 	 | set   | g & word .~ "HELLO": sets the word of g to "HELLO".                                              |
----------+-------+------------------------------------------------------------
- (%~) 	 | over  | g & word %~ T.toUpper: applies T.toUpper 
-         |       | to the word.                         
----------+-------+------------------------------------------------------------
- (&)     | apply | Reverse application, used for supplying the first record to 
-         |       | a composed lens, and for chaining operations 
----------+- -----+------------------------------------------------------------
+| Operator| Name  | Example                                                     |
+|---------+-------+-------------------------------------------------------------|
+| (^.) 	  | view  | g ^. word: gets word in g.                                  |
+|---------+-------+-------------------------------------------------------------|
+| (.~) 	  | set   | g & word .~ "HELLO": sets the word of g to "HELLO".         |
+|---------+-------+-------------------------------------------------------------|
+| (%~)    | over  | g & word %~ T.toUpper: applies T.toUpper                    |
+|         |       | to the word.                                                |
+|---------+-------+-------------------------------------------------------------|
+| (&)     | apply | Reverse application, used for supplying the first record to |
+|         |       | a composed lens, and for chaining operations                |
+|---------+- -----+-------------------------------------------------------------|
 
 * Creating the UI
 
