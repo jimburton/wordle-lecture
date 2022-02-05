@@ -86,12 +86,16 @@ is a way to represent the score of a letter in the guess:
 
 Each letter has to be marked *green*, *yellow* or *black*. 
 
-If a letter is black, it isn't anywhere in the word. If it is yellow, that /is/
-context-sensitive, because we are told where it /isn't/. Similarly with green.
+If a letter is black, it isn't anywhere in the word. 
+
+If it is yellow, that /is/ context-sensitive, because we are told where it
+/isn't/. 
+
+Similarly with green.
 
 * A datatype for scoring
 
-First attempt
+"First" attempt
 
 #+BEGIN_SRC haskell
 data CharInfo = 
@@ -142,7 +146,7 @@ score attempt target = undefined
 * Scoring a word
 
 A starting point is to begin by *zipping* the attempt and target up. The zip
-function in the ~Prelude~ wirks with lists, but there is a version of ~zip~ in
+function in the ~Prelude~ works with lists, but there is a version of ~zip~ in
 the text module.
 
 #+BEGIN_SRC haskell
@@ -167,8 +171,8 @@ ghci> zip it [0..]
 
 * Scoring a word
 
-The final function takes a list like this and maps over it. The ~singleton~
-function takes a value and produces a ~Set~ containing just that value.
+The ~singleton~ function takes a value and produces a ~Set~ containing just that
+value.
 
 #+BEGIN_SRC haskell
 score :: Text  -- ^ The attempt.
@@ -182,9 +186,27 @@ score attempt target =
                           else (c, Black)) $ zip (T.zip attempt target) [0..]
 #+END_SRC
 
+* Scoring a word
+
+I wrote the funciton on the previous slide but then got a hint from *hlint*
+reminding me that I could have used ~zipWith~ (saving me from  traversing 
+the lists twice).
+
+#+BEGIN_SRC haskell
+score :: Text  -- ^ The attempt.
+      -> Text  -- ^ The target word.
+      -> Guess -- ^ The scored attempt.
+score attempt target = 
+  zipWith (\(c,d) i -> if c==d 
+                       then (c, Green (S.singleton i))
+                       else if T.elem c target
+                            then (c, Yellow (S.singleton i))
+                            else (c, Black)) (T.zip attempt target) [0..]
+#+END_SRC
+
 *Demo:* cabal repl stage1
 
-* Scoring a word
+b* Scoring a word
 
 A ~Guess~ is correct if all the ~CharInfo~ values in it are green. We could map
 ~isGreen~ over a ~Guess~ then check that all the resulting values are ~True~,
@@ -204,11 +226,11 @@ correct gs = all (isGreen . snd) gs
 And for neatness, let's rewrite ~correct~ using *pointsfree* style.
 
 #+BEGIN_SRC haskell
--- correct gs = all isGreen gs is the same as:
+-- correct gs = all (isGreen . snd) gs is the same as:
 correct = all (isGreen . snd)
 #+END_SRC
 
-* Making more than one guess
+b* Making more than one guess
 
 Playing a game will mean making guesses until one of them is correct or six
 attempts have been made.
@@ -241,6 +263,8 @@ ghci> _word g
 "BLAH"
 #+END_SRC   
 
+* Records
+
 We can set one of the fields by giving ~key=value~ pairs inside braces like this:
 
 #+BEGIN_SRC haskell
@@ -272,7 +296,7 @@ gameWithWord secret = emptyGame { _word = secret }
 doGuess :: Game -> Text -> Game
 doGuess g attempt = let sc = score attempt (_word g) 
                         wn = correct sc 
-                        dn = wn || (_numAttempts g) == 5 in
+                        dn = wn || (_numAttempts g) == 6 in
   g { _numAttempts = (_numAttempts g)+1
     , _attempts = sc : (_attempts g)
     , _guess = Just attempt
@@ -295,7 +319,7 @@ this:
 doGuess :: Game -> Text -> Game
 doGuess g attempt = let sc = score attempt (g ^. word) 
                         wn = correct sc 
-                        dn = wn || (g ^. numAttempts) == 5 in
+                        dn = wn || (g ^. numAttempts) == 6 in
   g & numAttempts %~ +1
     & attempts %~ (sc:)
     & guess ?~ attempt
@@ -304,6 +328,21 @@ doGuess g attempt = let sc = score attempt (g ^. word)
 #+END_SRC 
 
 *Demo* cabal repl stage2
+
+* Common lens operators
+
+ Operator Name 	  Example                                                                                                 
+---------+-------+------------------------------------------------------------
+ (^.) 	 | view  | g ^. word: gets word in g.
+---------+-------+------------------------------------------------------------
+ (.~) 	 | set   | g & word .~ "HELLO": sets the word of g to "HELLO".                                              |
+---------+-------+------------------------------------------------------------
+ (%~) 	 | over  | g & word %~ T.toUpper: applies T.toUpper 
+         |       | to the word.                         
+---------+-------+------------------------------------------------------------
+ (&)     | apply | Reverse application, used for supplying the first record to 
+         |       | a composed lens, and for chaining operations 
+---------+- -----+------------------------------------------------------------
 
 * Creating the UI
 
@@ -317,7 +356,8 @@ and a function that takes guesses until the game is over.
 
 * Creating the UI
 
-A top-down outline of what we need:
+A top-down outline of what we need, mentioning several functions we haven't
+written yet:
 
 #+BEGIN_SRC haskell
 main :: IO ()
@@ -424,7 +464,7 @@ It runs in its own monad so to carry out IO actions inside it we use ~liftIO~.
 
 * Making an automated solver
 
-In the game the player, (if they are any good at it, chooses the next guess
+In the game the player, if they are any good, chooses the next guess
 based on the feedback from previous ones.
 
 We need a way of organising the feedback from the game and using it to filter
@@ -518,7 +558,7 @@ We add a ":HINT" command to the CLI. It selects a single word from the list of
 candidates. 
 
 It uses the functions ~hints~, which selects all candidate words for the
-constraints, and ~hint~, which picks the first one in the list.
+constraints, and ~hint~, which just picks the first one in the list.
 
 *Demo* cabal run stage4
 

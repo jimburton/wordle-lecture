@@ -195,7 +195,7 @@ showHint g = hint g >>= mapM_ TIO.putStrLn
 doGuess :: Game -> Text -> Game
 doGuess g attempt = let sc = score attempt (g ^. word) 
                         wn = correct sc 
-                        dn = wn || (g ^. numAttempts) == 5 in
+                        dn = wn || (g ^. numAttempts) == 6 in
   g & numAttempts %~ (+1)
     & attempts %~ (sc:) 
     & guess ?~ attempt
