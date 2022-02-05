@@ -94,10 +94,11 @@ context-sensitive, because we are told where it /isn't/. Similarly with green.
 First attempt
 
 #+BEGIN_SRC haskell
-data CharInfo = Green [Int]    -- ^ Char is at these indices.
-                | Yellow [Int] -- ^ Char is in the target word but not at any of these positions.
-                | Black        -- ^ Char is not in the target word.
-                deriving (Show, Eq)
+data CharInfo = 
+    Green [Int]  -- ^ Char is at these indices.
+  | Yellow [Int] -- ^ Char is in the target word but not at any of these positions.
+  | Black        -- ^ Char is not in the target word.
+  deriving (Show, Eq)
 #+END_SRC 
 
 (Full disclosure: I began with ~Green Int~, then I realised words could have
@@ -113,10 +114,11 @@ structure in the first place, which is ~Data.Set~.
 import qualified Data.Set as S
 import           Data.Set (Set)
 
-data CharInfo = Green (Set Int)    -- ^ Char is at these indices.
-                | Yellow (Set Int) -- ^ Char is in the target word but not at any of these positions.
-                | Black            -- ^ Char is not in the target word.
-                deriving (Show, Eq)
+data CharInfo = 
+    Green (Set Int)  -- ^ Char is at these indices.
+  | Yellow (Set Int) -- ^ Char is in the target word but not at any of these positions.
+  | Black            -- ^ Char is not in the target word.
+  deriving (Show, Eq)
 #+END_SRC 
 
 * Scoring a word
@@ -180,7 +182,7 @@ score attempt target =
                           else (c, Black)) $ zip (T.zip attempt target) [0..]
 #+END_SRC
 
-*Demo*
+*Demo:* cabal repl stage1
 
 * Scoring a word
 
@@ -194,7 +196,7 @@ isGreen (Green _) = True
 isGreen _         = False
 
 correct :: Guess -> Bool
-correct gs = all isGreen gs
+correct gs = all (isGreen . snd) gs
 #+END_SRC
 
 * Scoring a word
@@ -203,7 +205,7 @@ And for neatness, let's rewrite ~correct~ using *pointsfree* style.
 
 #+BEGIN_SRC haskell
 -- correct gs = all isGreen gs is the same as:
-correct = all isGreen
+correct = all (isGreen . snd)
 #+END_SRC
 
 * Making more than one guess
@@ -258,7 +260,6 @@ emptyGame = Game {
   , _done = False
   , _success = False
   }
-  deriving (Show, Eq)
 
 gameWithWord :: Text -> Game
 gameWithWord secret = emptyGame { _word = secret } 
@@ -302,7 +303,7 @@ doGuess g attempt = let sc = score attempt (g ^. word)
     & success .~ wn 
 #+END_SRC 
 
-*Demo in ghci*
+*Demo* cabal repl stage2
 
 * Creating the UI
 
@@ -419,7 +420,7 @@ It runs in its own monad so to carry out IO actions inside it we use ~liftIO~.
 
 * The UI
 
-*Demo: code then playing the game.*
+*Demo* cabal run stage 3
 
 * Making an automated solver
 
@@ -516,11 +517,14 @@ shrinks rapidly.
 We add a ":HINT" command to the CLI. It selects a single word from the list of
 candidates. 
 
-*Demo*
+It uses the functions ~hints~, which selects all candidate words for the
+constraints, and ~hint~, which picks the first one in the list.
+
+*Demo* cabal run stage4
 
 * The solver
 
-Finally, we want to use ~findWords~ to play whole games from scratch.
+Finally, we want to use ~hint~ to play whole games from scratch.
 
 For the first word, there is no information available. Hints would include the
 entire dictionary.
@@ -567,8 +571,20 @@ This is a *greedy* algorithm, in that it takes what looks like the best choice
 based just on the local information.
 
 
-But w may not be the best choice -- it could lead to a dead end.
+But it may not actually be the best choice -- it could lead to a dead end.
 
 So we have to build in some *backtracking*. If w turns out to be a dead end we
 will retrace our steps. 
 
+* Automating the solver
+
+We finish by macking a number of functions that automate the playing of a game.
+
+The functions are ~solve~, ~solveTurn~ and ~backtrack~. The algorithm:
+
++ Start a game with the fixed word.
++ LOOP (until the game is over):
+  + IF there is a next best hint, play it and continue
+  + ELSE undo the last guess, blacklist it and try another word
+
+*Demo* cabal repl stage5

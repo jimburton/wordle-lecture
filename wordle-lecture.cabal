@@ -20,13 +20,79 @@ maintainer:         j.burton@brighton.ac.uk
 category:           Game
 extra-source-files: CHANGELOG.md
 
-executable wordle-lecture
-    main-is:          Stage1.hs
-    -- other-modules:
+executable stage1
+    main-is:          Main.hs
+    other-modules:    Stage1
 
     -- LANGUAGE extensions used by modules in this package.
     other-extensions: OverloadedStrings
     build-depends:    base ^>=4.15.0.0
-                    , text
-    hs-source-dirs:   app
+                    , text ^>=1.2.5.0
+                    , containers
+    hs-source-dirs:   app/stage1
+    default-language: Haskell2010
+
+executable stage2
+    main-is:          Main.hs
+    other-modules:    Stage2
+
+    -- LANGUAGE extensions used by modules in this package.
+    other-extensions: OverloadedStrings
+    build-depends:    base ^>=4.15.0.0
+                    , text ^>=1.2.5.0
+                    , containers
+                    , microlens
+                    , microlens-th
+    hs-source-dirs:   app/stage2
+    default-language: Haskell2010
+
+executable stage3
+    main-is:          Main.hs
+    other-modules:    Stage3
+
+    -- LANGUAGE extensions used by modules in this package.
+    other-extensions: OverloadedStrings
+    build-depends:    base ^>=4.15.0.0
+                    , text ^>=1.2.5.0
+                    , containers
+                    , microlens
+                    , microlens-th
+                    , haskeline
+                    , vector
+                    , random
+    hs-source-dirs:   app/stage3
+    default-language: Haskell2010
+
+executable stage4
+    main-is:          Main.hs
+    other-modules:    Stage4
+
+    -- LANGUAGE extensions used by modules in this package.
+    other-extensions: OverloadedStrings
+    build-depends:    base ^>=4.15.0.0
+                    , text ^>=1.2.5.0
+                    , containers
+                    , microlens
+                    , microlens-th
+                    , haskeline
+                    , vector
+                    , random
+    hs-source-dirs:   app/stage4
+    default-language: Haskell2010
+
+executable stage5
+    main-is:          Main.hs
+    other-modules:    Stage5
+
+    -- LANGUAGE extensions used by modules in this package.
+    other-extensions: OverloadedStrings
+    build-depends:    base ^>=4.15.0.0
+                    , text ^>=1.2.5.0
+                    , containers
+                    , microlens
+                    , microlens-th
+                    , haskeline
+                    , vector
+                    , random
+    hs-source-dirs:   app/stage5
     default-language: Haskell2010
