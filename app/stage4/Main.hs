@@ -1,5 +1,6 @@
 module Main where
 
+import Stage4
+
 main :: IO ()
-main = do
-  putStrLn "Hello, Haskell!"
+main = initGame >>= playGame

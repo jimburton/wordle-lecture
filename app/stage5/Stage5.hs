@@ -87,29 +87,26 @@ findWords inf bl =
                           Black       -> not $ c `T.elem` t) inf)
 
 -- | Start a game with a random target and a solver.
-solve :: Handle -> IO Game
-solve h = do
+solve :: IO ()
+solve = do
   g <- initGame
-  solveTurn (firstGuess g) h
+  solveTurn (firstGuess g)
 
 -- | Start a game with a given word and a solver.
-solveWithWord :: Handle -> Text -> IO Game
-solveWithWord h w = solveTurn (firstGuess $ gameWithWord w) h
+solveWithWord :: Text -> IO ()
+solveWithWord w = solveTurn (firstGuess $ gameWithWord w)
 
 -- | Allow the AI solver to take guesses until the game is over.
-solveTurn :: Game -> Handle -> IO Game
-solveTurn g h = do
-  -- drawGrid g
+solveTurn :: Game -> IO ()
+solveTurn g = do
   if g ^. done
     then do let t = "WORD: "<>g ^. word<>", SUCCESS: "<>T.pack (show $ g ^. success)<>", GUESSES: "<>T.pack (show (g ^. numAttempts))
-            TIO.hPutStrLn h t
-            hFlush h
-            pure g
+            TIO.putStrLn t
     else do
     ht <- hint g
     case ht of
-      Nothing  -> solveTurn (backtrack g) h
-      (Just t) -> solveTurn (doGuess g t) h
+      Nothing  -> solveTurn (backtrack g)
+      (Just t) -> solveTurn (doGuess g t)
 
 -- | Take a step backward in the game. Used by the solver.
 backtrack :: Game -> Game
