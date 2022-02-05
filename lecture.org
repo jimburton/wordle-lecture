@@ -5,7 +5,15 @@
 
 #+end_center
 
-* It is (was?) all the rage
+* The code
+
+This lecture is based on https:github.com/jimburton/hordle
+
+These slides and the incrementally developed code in them is at
+https:github.com/jimburton/wordle-lecture
+
+
+* Wordle is (was?) all the rage
 
 Wordle is a game in which you have to guess a secret five-letter word in six
 tries.
