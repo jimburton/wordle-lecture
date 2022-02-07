@@ -474,16 +474,52 @@ It runs in its own monad so to carry out IO actions inside it we use ~liftIO~.
 
 *Demo* cabal run stage 3
 
-* Making an automated solver
+* Solving Wordle 
 
-In the game the player, if they are any good, chooses the next guess
-based on the feedback from previous ones.
+Wordle certainly caught the imagination of data scientists, mathematicians and
+programmers.
+ 
+The most interesting approaches to writing a program that can play Wordle depend
+on *statistical properties of words* (which words are most likely to be a good
+guess) and *Information Theory* (which guesses will increase the amount of
+information at hand).
+
+For a good example of a rigorous mathematical approach see [this video by
+Grant Sanderson](https://www.youtube.com/watch?v=v68zYyaEmEA&t=17s).
+
+* Our approach
+
+Our solver will be far simpler. Actually, so simple it's a stretch to call it a
+solver...
+
+At each stage in a game, we have some information about which words could
+possibly be the answer, based on feedback from previous guesses.
+
+This information is used to filter the dictionary, resulting in a list of all
+possible hints.
+
+Each of these hints will be applied as a guess.
+
+* Our approach
+
+Applying every hint as a guess results in a list of possible games, each of
+which yields a new set of hints.
+
+We order the list of possible games by the number of hints available in each
+and select one which has the fewest.
+
+In this way, we have reduced the possible subsequent guesses required by the
+largest amount.
+
+* Our approach 
+
+However, applying each guess in a "hypothetical" game is cheating, really.
+
+Before we get on to that, let's look at how to generate the hints, possible
+candidates for the solution based on the current information.
 
 We need a way of organising the feedback from the game and using it to filter
 the dictionary.
-
-This can be used to provide hints to a human player but also to solve entire
-games. 
 
 * The info map
 
